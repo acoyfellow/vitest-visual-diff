@@ -1,0 +1,42 @@
+{
+  "name": "diffgate",
+  "version": "0.1.0",
+  "description": "A Vitest custom matcher: fail-closed structure+style+pixel+a11y cascade for comparing two live rendered elements in Browser Mode.",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/types.d.ts",
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "keywords": [
+    "vitest",
+    "vitest-plugin",
+    "visual-regression",
+    "visual-diff",
+    "browser-mode",
+    "custom-matcher",
+    "pixelmatch",
+    "accessibility"
+  ],
+  "peerDependencies": {
+    "vitest": ">=4.0.0"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@vitest/browser": "^4.1.10",
+    "@vitest/browser-playwright": "^4.1.10",
+    "playwright": "^1.61.1",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "pixelmatch": "^7.2.0"
+  }
+}
