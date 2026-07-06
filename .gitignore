@@ -5,3 +5,5 @@ test/__screenshots__/
 .vitest-attachments/
 .DS_Store
 *.log
+site/
+.wrangler/

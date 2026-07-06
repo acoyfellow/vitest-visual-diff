@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vitest-visual-diff-docs",
+  "account_id": "bfcb6ac5b3ceaf42a09607f6f7925823",
+  "compatibility_date": "2025-01-01",
+  "observability": { "enabled": true },
+  // Static docs only — no API, no secrets, no workers.dev URL.
+  "workers_dev": false,
+  "routes": [{ "pattern": "vitest-visual-diff.coey.dev", "custom_domain": true }],
+  "assets": {
+    "directory": "./site"
+  }
+}

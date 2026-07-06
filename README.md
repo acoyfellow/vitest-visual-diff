@@ -1,5 +1,7 @@
 # vitest-visual-diff
 
+[Docs](https://vitest-visual-diff.coey.dev) · [source](https://github.com/acoyfellow/vitest-visual-diff)
+
 A Vitest matcher for Browser Mode that answers one question: **are these two
 elements, rendered live in a real browser, actually the same?**
 
