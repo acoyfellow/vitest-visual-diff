@@ -1,0 +1,13 @@
+{
+  "name": "vitest-visual-diff-playground-harness",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "vitest": "^4.1.10",
+    "@vitest/browser": "^4.1.10",
+    "@vitest/browser-playwright": "^4.1.10",
+    "playwright": "^1.61.1",
+    "vitest-visual-diff": "file:./vitest-visual-diff-0.0.1.tgz"
+  }
+}

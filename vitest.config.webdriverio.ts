@@ -8,6 +8,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    exclude: ['**/node_modules/**', 'experiments/**'],
     setupFiles: ['./src/index.ts'],
     browser: {
       enabled: true,

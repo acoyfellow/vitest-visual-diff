@@ -1,7 +1,15 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
   "files": {
-    "includes": ["**", "!node_modules", "!test/__screenshots__", "!.vitest-attachments", "!site"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!test/__screenshots__",
+      "!.vitest-attachments",
+      "!site",
+      "!experiments/playground-sandbox",
+      "!experiments/playground-browser-run"
+    ]
   },
   "formatter": {
     "enabled": true,
