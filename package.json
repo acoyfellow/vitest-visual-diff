@@ -1,16 +1,33 @@
 {
-  "name": "diffgate",
-  "version": "0.1.0",
-  "description": "A Vitest custom matcher: fail-closed structure+style+pixel+a11y cascade for comparing two live rendered elements in Browser Mode.",
+  "name": "vitest-visual-diff",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Compare two live elements through structure, computed style, pixels, and accessibility in Vitest Browser Mode.",
   "type": "module",
-  "main": "src/index.js",
-  "types": "src/types.d.ts",
+  "sideEffects": [
+    "./src/index.ts"
+  ],
+  "packageManager": "bun@1.3.14",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acoyfellow/vitest-visual-diff.git"
+  },
+  "homepage": "https://github.com/acoyfellow/vitest-visual-diff#readme",
+  "bugs": {
+    "url": "https://github.com/acoyfellow/vitest-visual-diff/issues"
+  },
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "files": [
     "src",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
   },
   "keywords": [
     "vitest",
@@ -23,17 +40,27 @@
     "accessibility"
   ],
   "peerDependencies": {
+    "@vitest/browser": ">=4.0.0",
     "vitest": ">=4.0.0"
   },
   "scripts": {
+    "check": "bun run format:check && bun run typecheck && bun run test && bun run test:webdriverio && bun run test:all-browsers",
+    "format": "biome check --write .",
+    "format:check": "biome check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:webdriverio": "vitest run --config vitest.config.webdriverio.ts",
+    "test:all-browsers": "vitest run --config vitest.config.multibrowser.ts",
+    "typecheck": "tsc --noEmit"
   },
   "license": "MIT",
   "devDependencies": {
     "@vitest/browser": "^4.1.10",
     "@vitest/browser-playwright": "^4.1.10",
+    "@biomejs/biome": "^2.3.8",
+    "@vitest/browser-webdriverio": "^4.1.10",
     "playwright": "^1.61.1",
+    "typescript": "^5.9.3",
     "vitest": "^4.1.10"
   },
   "dependencies": {

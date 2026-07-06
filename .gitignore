@@ -1,4 +1,7 @@
 node_modules/
+dist/
+coverage/
 test/__screenshots__/
 .vitest-attachments/
+.DS_Store
 *.log
