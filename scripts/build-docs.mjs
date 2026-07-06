@@ -5,11 +5,33 @@
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { marked } from 'marked';
+import { getSingletonHighlighter } from 'shiki';
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 const md = readFileSync('README.md', 'utf8');
 
+const THEME = 'github-light';
+const FALLBACK_LANG = 'text';
+
+// Shiki highlights synchronously once loaded, but loading the highlighter
+// itself is async — pre-scan the fenced code blocks, load only the languages
+// actually used, then highlight them all before the (synchronous) marked
+// render pass so a single custom renderer.code can stay simple.
+const tokens = marked.lexer(md);
+const codeTokens = tokens.filter((t) => t.type === 'code');
+const langs = [...new Set(codeTokens.map((t) => t.lang || FALLBACK_LANG))];
+const highlighter = await getSingletonHighlighter({
+  themes: [THEME],
+  langs: ['js', 'ts', 'sh', 'text', ...langs],
+});
+
 const renderer = new marked.Renderer();
+renderer.code = ({ text, lang }) => {
+  const known = highlighter.getLoadedLanguages();
+  const resolved = lang && known.includes(lang) ? lang : FALLBACK_LANG;
+  return highlighter.codeToHtml(text, { lang: resolved, theme: THEME });
+};
+
 const slugCounts = new Map();
 function slugify(text) {
   const base = text
@@ -26,7 +48,8 @@ renderer.heading = ({ tokens, depth }) => {
   const inline = marked.parseInline(text);
   return `<h${depth} id="${id}">${inline}</h${depth}>\n`;
 };
-const body = marked.parse(md, { renderer });
+
+const body = marked.parser(tokens, { renderer });
 
 const html = `<!doctype html>
 <html lang="en">
@@ -54,8 +77,8 @@ const html = `<!doctype html>
   main h3 { font-size: 17px; margin-top: 30px; }
   main p, main li { line-height: 1.65; font-size: 15.5px; }
   code { font-family: ui-monospace, SFMono-Regular, monospace; background: #f1f0ee; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
-  pre { background: #1c1917; color: #f4f4f4; padding: 16px 18px; border-radius: 10px; overflow-x: auto; }
-  pre code { background: none; padding: 0; color: inherit; }
+  pre.shiki { padding: 16px 18px; border-radius: 10px; overflow-x: auto; font-size: 14px; }
+  pre.shiki code { background: none; padding: 0; }
   table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
   th, td { border: 1px solid #e7e5e4; padding: 8px 10px; text-align: left; vertical-align: top; }
   th { background: #f5f5f4; }

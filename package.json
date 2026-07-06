@@ -63,6 +63,7 @@
     "@vitest/browser-webdriverio": "^4.1.10",
     "marked": "^18.0.5",
     "playwright": "^1.61.1",
+    "shiki": "^4.3.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10",
     "wrangler": "^4.107.0"
