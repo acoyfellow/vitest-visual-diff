@@ -69,6 +69,7 @@ export interface VisualDiffOptions {
 }
 
 export type VisualDiffTarget = Locator | Element;
+export type VisualDiffSequenceTarget = readonly VisualDiffTarget[];
 
 export interface CascadeOptions {
   baselinePng?: PixelFrame | null;

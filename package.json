@@ -1,7 +1,6 @@
 {
   "name": "vitest-visual-diff",
   "version": "0.0.1",
-  "private": true,
   "description": "Compare two live elements through structure, computed style, pixels, and accessibility in Vitest Browser Mode.",
   "type": "module",
   "sideEffects": [

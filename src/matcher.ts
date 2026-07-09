@@ -6,7 +6,13 @@ import type { MatcherState } from 'vitest';
 import { type CascadeResult, cascade } from './cascade.ts';
 import { decodePngBase64 } from './decode-browser.ts';
 import { walkElement } from './extract-browser.ts';
-import type { PixelFrame, VisualDiffOptions, VisualDiffTarget } from './types.ts';
+import { cascadeSequence } from './temporal.ts';
+import type {
+  PixelFrame,
+  VisualDiffOptions,
+  VisualDiffSequenceTarget,
+  VisualDiffTarget,
+} from './types.ts';
 
 interface MatcherResult {
   pass: boolean;
@@ -92,6 +98,75 @@ function formatDefects(result: CascadeResult): string {
     }
   }
   return lines.join('\n');
+}
+
+export async function toMatchVisualDiffSequence(
+  this: MatcherState,
+  candidate: VisualDiffSequenceTarget,
+  baseline: VisualDiffSequenceTarget,
+  options: VisualDiffOptions = {},
+): Promise<MatcherResult> {
+  if (!Array.isArray(candidate) || !Array.isArray(baseline)) {
+    throw new TypeError('vitest-visual-diff: sequence matcher expects two arrays of frames');
+  }
+
+  const candidateTargets = candidate.map(resolve);
+  const baselineTargets = baseline.map(resolve);
+  const allLocators = [...candidateTargets, ...baselineTargets].every(
+    (target) => target.locator !== null,
+  );
+  if (options.pixels === true && !allLocators) {
+    throw new TypeError(
+      'vitest-visual-diff: pixels:true requires every sequence frame to be a Vitest Locator',
+    );
+  }
+  const comparePixels = options.pixels !== false && allLocators;
+  const candidateStructs = candidateTargets.map((target) => walkElement(target.element));
+  const baselineStructs = baselineTargets.map((target) => walkElement(target.element));
+
+  const candidatePng = comparePixels
+    ? await Promise.all(
+        candidateTargets.map((target) => screenshotFrame(target.locator as Locator)),
+      )
+    : undefined;
+  const baselinePng = comparePixels
+    ? await Promise.all(baselineTargets.map((target) => screenshotFrame(target.locator as Locator)))
+    : undefined;
+
+  const result = cascadeSequence(baselineStructs, candidateStructs, {
+    style: options.style,
+    pixels: options.pixelOpts,
+    a11y: options.a11y ?? false,
+    baselinePng,
+    candidatePng,
+  });
+
+  return {
+    pass: result.pass,
+    actual: candidateStructs,
+    expected: baselineStructs,
+    message: () => {
+      const verb = this.isNot ? 'not to' : 'to';
+      if (result.pass) {
+        return `expected candidate sequence ${verb} match visual-diff baseline across ${result.frames.length} frames, but it did`;
+      }
+
+      const divergent = result.frames[result.firstDivergence];
+      if ('reason' in divergent) {
+        return `expected candidate sequence ${verb} match visual-diff baseline: frame ${result.firstDivergence}, frame-count mismatch (baseline=${baseline.length}, candidate=${candidate.length})`;
+      }
+      const failedTiers = Object.entries(divergent.tiers)
+        .filter(([, pass]) => pass === false)
+        .map(([tier]) => tier);
+      const tierLabel = failedTiers.length === 1 ? 'tier' : 'tiers';
+      return [
+        `expected candidate sequence ${verb} match visual-diff baseline: frame ${result.firstDivergence}, ${tierLabel} ${failedTiers.join(', ')} failed`,
+        formatDefects(divergent.cascade),
+      ]
+        .filter(Boolean)
+        .join('\n');
+    },
+  };
 }
 
 export async function toMatchVisualDiff(
